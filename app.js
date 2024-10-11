@@ -71,7 +71,8 @@ app.post("/login", async function (req, res) {
 
 app.get("/profile", isLoggedIn, async function (req, res) {
     let user = await userModel.findOne({ email: req.user.email }).populate("posts");
-    res.render("profile", { user });
+    let posts = await postModel.find().populate("user")
+    res.render("profile", { user, posts });
 })
 
 app.post("/post", isLoggedIn, async function (req, res) {

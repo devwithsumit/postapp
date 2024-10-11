@@ -18,7 +18,7 @@
                     <div class="h-12 rounded-lg aspect-square overflow-hidden bg-gray-300">
                         <img class="h-full w-full object-cover object-top" src="/uploads/<%= user.profilepic%>" alt="">
                     </div>
-                    <h1 class="text-3xl font-semibold">Hello, Sumit Kushwah <%= %> 👋</h1>
+                    <h1 class="text-3xl font-semibold">Hello, <%= user.name %> 👋</h1>
                 </div>
                 <a href="/logout" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Logout</a>
             </div>
@@ -36,14 +36,14 @@
         
         <!-- Posts Section -->
         <div class="w-full max-w-4xl space-y-4">
-            <h2 class="text-xl font-semibold">Your Posts:</h2>
+            <h2 class="text-xl font-semibold">All Posts:</h2>
         
             <!-- Post Card -->
-            <% user.posts.reverse().forEach(post=>{ %>
+            <% posts.reverse().forEach(post=>{ %>
                 <div class="bg-gray-800 p-4 rounded-lg shadow-lg">
                     <div class="flex flex-col justify-center items-stretch">
                         <div>
-                            <span class="font-bold">@<%= user.name %></span>
+                            <span class="font-bold">@<%= post.user.name %></span>
                             <p class="text-gray-400 mt-2">
                                 <%= post.postdata  %>
                             </p>
