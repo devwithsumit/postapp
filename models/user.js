@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-mongoose.connect("mongodb://localhost:27017/miniPostAPP")
+mongoose.connect("mongodb+srv://sumit2410:Sumit2410@cluster0.nzb4o.mongodb.net/miniPostAPP")
 
 const userSchema = mongoose.Schema({
     name : String,
