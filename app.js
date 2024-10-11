@@ -97,7 +97,7 @@ app.get("/like/:id", isLoggedIn, async function (req, res) {
         post.likes.splice(post.likes.indexOf(req.user.userid), 1);
     }    
     await post.save();
-    res.redirect("/profile");
+    res.json(post);
 })
 
 app.get("/edit/:id", isLoggedIn, async function (req, res) {
