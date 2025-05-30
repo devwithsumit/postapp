@@ -1,19 +1,23 @@
 const mongoose = require("mongoose");
+require('dotenv').config();
 
-mongoose.connect("mongodb+srv://sumit2410:Sumit2410@cluster0.nzb4o.mongodb.net/miniPostAPP")
+mongoose.connect(process.env.MONGODB_URL)
+    .then(() => {
+        console.log("Mongo DB connected")
+    })
 
 const userSchema = mongoose.Schema({
-    name : String,
-    email : String,
-    password : String,
-    profilepic : {
-        type : String,
-        default : "default.png"
+    name: String,
+    email: String,
+    password: String,
+    profilepic: {
+        type: String,
+        default: "default.png"
     },
-    posts :[
+    posts: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref : 'post'
+            ref: 'post'
         }
     ]
 })

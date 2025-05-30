@@ -9,14 +9,16 @@ const cookieParser = require("cookie-parser");
 const upload = require("./config/multerconfig");
 const session = require('express-session');
 const flash = require('connect-flash');
+// require('dotenv').config();
 
 app.set("view engine", "ejs")
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")))
+
 app.use(session({
-    secret: 'secret123', // A strong secret string
+    secret: process.env.SESSION_KEY, // A strong secret string
     resave: false,
     saveUninitialized: true
 }));
@@ -171,12 +173,13 @@ function isLoggedIn(req, res, next) {
         next();
     }
 }
-app.listen(3000,()=>{
+app.listen(process.env.PORT,()=>{
     // Green color for the message
     const greenColor = '\x1b[32m';
     const blueColor = '\x1b[33m';
-    console.log(`Server live at: ${blueColor}http://localhost:3000`);
+    console.log(`Server live at: ${blueColor}http://localhost:${process.env.PORT}`);
 });
+module.exports = app;
 
 // async function removeNameField() {
 //     try {
