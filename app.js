@@ -7,13 +7,30 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const upload = require("./config/multerconfig");
-const { render } = require("ejs");
+const session = require('express-session');
+const flash = require('connect-flash');
 
 app.set("view engine", "ejs")
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")))
+app.use(session({
+    secret: 'secret123', // A strong secret string
+    resave: false,
+    saveUninitialized: true
+}));
+app.use(flash());
+
+app.use((req, res, next) => {
+    // You can name these variables whatever you like
+    res.locals.success_msg = req.flash('success');
+    res.locals.error_msg = req.flash('error');
+    res.locals.info_msg = req.flash('info'); // If you use other types of messages
+    // You might also want to make user data available here if using Passport.js
+    // res.locals.currentUser = req.user; // Example for authenticated user
+    next(); // IMPORTANT: Call next() to pass control to the next middleware/route handler
+});
 
 app.get("/", function (req, res) {
     res.render('index');
@@ -33,7 +50,11 @@ app.post("/register", async function (req, res) {
     let { name, email, password } = req.body;
 
     let user = await userModel.findOne({ email });
-    if (user) return res.status(500).send("Email already registered !");
+    if (user) {
+        // return res.status(500).send("Email already registered !");
+        req.flash('error', 'Email already registered!');
+        return res.status(409).redirect('/');
+    }
 
     bcrypt.genSalt(10, function (err, salt) {
         bcrypt.hash(password, salt, async (err, hash) => {
@@ -44,7 +65,9 @@ app.post("/register", async function (req, res) {
             });
             let token = jwt.sign({ email: email, userid: user._id }, "secret");
             res.cookie("token", token);
-            res.send("New User Registered");
+            req.flash('success', 'Registration successful!');
+            res.status(200).redirect("/profile");
+            // res.send("New User Registered");
         });
     });
 });
@@ -57,15 +80,22 @@ app.post("/login", async function (req, res) {
     let { email, password } = req.body;
     
     let user = await userModel.findOne({ email });
-    if (!user) return res.status(500).send("Something Went Wrong !");
+    if (!user) {
+        req.flash('error', 'Invalid email or password.');
+        return res.status(500).redirect("/loginPage");
+    }
     
     bcrypt.compare(password, user.password, function (err, result) {
         if (result) {
             let token = jwt.sign({ email: email, userid: user._id }, "secret");
             res.cookie("token", token);
+            req.flash('success', 'Logged in successfully!');
             res.status(200).redirect("/profile");
         }
-        else res.redirect("/loginPage");
+        else {
+            req.flash('error', 'Invalid email or password.'); 
+            res.redirect("/loginPage");
+        }
     });
 });
 
@@ -112,6 +142,7 @@ app.post("/update/:id", isLoggedIn, async function (req, res) {
 
 app.get("/logout", function (req, res) {
     res.cookie("token", "")
+    req.flash('success', "Logout successful");
     res.redirect("/loginPage")
 })
 
@@ -140,7 +171,12 @@ function isLoggedIn(req, res, next) {
         next();
     }
 }
-app.listen(3000);
+app.listen(3000,()=>{
+    // Green color for the message
+    const greenColor = '\x1b[32m';
+    const blueColor = '\x1b[33m';
+    console.log(`Server live at: ${blueColor}http://localhost:3000`);
+});
 
 // async function removeNameField() {
 //     try {
